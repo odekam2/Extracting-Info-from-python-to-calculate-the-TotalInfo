@@ -1,0 +1,40 @@
+# Extracting-Info-from-python-to-calculate-the-TotalInfo
+
+import pandas as pd
+import openpyxl
+import pprint
+file = 'produceSales.xlsx'
+data = pd.ExcelFile(file)
+print(data.sheet_names) #this returns the all the sheets in the excel file
+df = data.parse('Sheet1')
+df.info()
+
+df.head(10)
+
+ps = openpyxl.load_workbook('produceSales.xlsx')
+sheet = ps['Sheet1']
+TotalInfo = {}
+print(sheet.max_row)
+#returns the total number of rows in the sheet 23758
+
+for row in range(2,sheet.max_row+1):
+    produce = sheet['B'+str(row)].value
+    cost_per_pound = sheet['C'+str(row)].value
+    pounds_sold = sheet['D'+str(row)].value
+    total_sales = sheet['E'+str(row)].value
+
+    TotalInfo.setdefault(produce, {'Total_cost_per_pound is Rs': 0,
+                                   'Total_pounds_sold is': 0,
+                                   'Total_sales is Rs': 0,
+                                   'Total_Purchase_Instances': 0})
+    TotalInfo[produce]['Total_cost_per_pound is Rs'] += float(cost_per_pound)
+    TotalInfo[produce]['Total_pounds_sold is'] += float(pounds_sold)
+
+    TotalInfo[produce]['Total_sales is Rs'] += int(total_sales)
+    TotalInfo[produce]['Total_Purchase_Instances'] += 1
+
+TotalInfo
+resultfile = open('TotalInfo.txt','w')
+resultfile.write(pprint.pformat(TotalInfo))
+resultfile.close()
+print('Done')
